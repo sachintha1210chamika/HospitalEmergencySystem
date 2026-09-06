@@ -2,7 +2,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class EmergencyQueue {
-    private Queue<Patient> queue;
+    private final Queue<Patient> queue;
 
     public EmergencyQueue() {
         this.queue = new LinkedList<>();
