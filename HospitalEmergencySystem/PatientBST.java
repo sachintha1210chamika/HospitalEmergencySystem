@@ -1,13 +1,12 @@
 public class PatientBST {
-    private Patient root;
+    private Patient root = null;
 
     public PatientBST() {
-        this.root = null;
     }
 
-    // 1. Insert Patient
+    // Insert Patient
     public void insert(int id, String name, int age, String contact, String condition) {
-        root = insertRec(root, new Patient(id, name, age, contact, condition));
+        this.root = this.insertRec(this.root, new Patient(id, name, age, contact, condition));
         System.out.println("Patient added successfully!");
     }
 
@@ -15,80 +14,102 @@ public class PatientBST {
         if (root == null) {
             return newPatient;
         }
+
         if (newPatient.patientId < root.patientId) {
-            root.left = insertRec(root.left, newPatient);
+            root.left = this.insertRec(root.left, newPatient);
         } else if (newPatient.patientId > root.patientId) {
-            root.right = insertRec(root.right, newPatient);
+            root.right = this.insertRec(root.right, newPatient);
         } else {
             System.out.println("Patient ID already exists!");
         }
+
         return root;
     }
 
-    // 2. Search Patient
+    // Search Patient
     public Patient search(int id) {
-        return searchRec(root, id);
+        return this.searchRec(this.root, id);
     }
 
     private Patient searchRec(Patient root, int id) {
         if (root == null || root.patientId == id) {
             return root;
         }
+
         if (id < root.patientId) {
-            return searchRec(root.left, id);
+            return this.searchRec(root.left, id);
+        } else {
+            return this.searchRec(root.right, id);
         }
-        return searchRec(root.right, id);
     }
 
-    // 3. Delete Patient
+    // Delete Patient
     public void delete(int id) {
-        root = deleteRec(root, id);
+        if (search(id) == null) {
+            System.out.println("Patient ID not found.");
+            return;
+        }
+        this.root = this.deleteRec(this.root, id);
+        System.out.println("Patient deleted successfully.");
     }
 
     private Patient deleteRec(Patient root, int id) {
         if (root == null) {
-            System.out.println("Patient ID not found.");
-            return root;
+            return null;
         }
-        if (id < root.patientId) {
-            root.left = deleteRec(root.left, id);
-        } else if (id > root.patientId) {
-            root.right = deleteRec(root.right, id);
-        } else {
-            if (root.left == null) return root.right;
-            else if (root.right == null) return root.left;
 
-            root.patientId = minValue(root.right);
-            root.right = deleteRec(root.right, root.patientId);
-            System.out.println("Patient deleted successfully.");
+        if (id < root.patientId) {
+            root.left = this.deleteRec(root.left, id);
+        } else if (id > root.patientId) {
+            root.right = this.deleteRec(root.right, id);
+        } else {
+            // Case 1 & Case 2: Node with 0 or 1 child
+            if (root.left == null) {
+                return root.right;
+            } else if (root.right == null) {
+                return root.left;
+            }
+
+            // Case 3: Node with 2 children
+            Patient successor = this.minValueNode(root.right);
+            
+            // Copy all patient data (not just ID)
+            root.patientId = successor.patientId;
+            root.name = successor.name;
+            root.age = successor.age;
+            root.contactNumber = successor.contactNumber;
+            root.medicalCondition = successor.medicalCondition;
+
+            // Delete the successor
+            root.right = this.deleteRec(root.right, successor.patientId);
         }
+
         return root;
     }
 
-    private int minValue(Patient root) {
-        int minVal = root.patientId;
-        while (root.left != null) {
-            minVal = root.left.patientId;
-            root = root.left;
+    private Patient minValueNode(Patient root) {
+        Patient current = root;
+        while (current.left != null) {
+            current = current.left;
         }
-        return minVal;
+        return current;
     }
 
-    // 4. In-order Traversal (Display All Patients in Ascending Order)
+    // Display All Patients
     public void displayAll() {
-        if (root == null) {
+        if (this.root == null) {
             System.out.println("No patient records available.");
-            return;
+        } else {
+            System.out.println("\n--- Patient Records (Sorted by ID) ---");
+            this.inOrderRec(this.root);
         }
-        System.out.println("\n--- Patient Records (Sorted by ID) ---");
-        inOrderRec(root);
     }
 
     private void inOrderRec(Patient root) {
         if (root != null) {
-            inOrderRec(root.left);
+            this.inOrderRec(root.left);
             root.displayPatient();
-            inOrderRec(root.right);
+            this.inOrderRec(root.right);
         }
     }
 }
